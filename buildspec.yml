@@ -1,5 +1,9 @@
 version: 0.2
 
+env:
+  variables:
+    TF_IN_AUTOMATION: "true"
+
 phases:
 
   install:
@@ -8,16 +12,21 @@ phases:
       - curl -LO https://releases.hashicorp.com/terraform/1.6.6/terraform_1.6.6_linux_amd64.zip
       - unzip terraform_1.6.6_linux_amd64.zip
       - mv terraform /usr/local/bin/
+      - terraform --version
 
   pre_build:
     commands:
-      - terraform --version
+      - echo Initializing Terraform
       - terraform init
 
   build:
     commands:
-      - terraform plan
+      - echo Running Terraform Validate
+      - terraform validate
+      - echo Running Terraform Plan
+      - terraform plan -out=tfplan
 
   post_build:
     commands:
-      - terraform apply -auto-approve
+      - echo Applying Terraform Plan
+      - terraform apply -auto-approve tfplan
